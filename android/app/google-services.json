@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "829358056062",
+    "firebase_url": "https://doan-e704b-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "doan-e704b",
+    "storage_bucket": "doan-e704b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:829358056062:android:ccb8be44dd3e7c1669ae2f",
+        "android_client_info": {
+          "package_name": "com.example.do_an"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAs9yNC8d3SC2uRYsjLrjT2PSbuibvrLdM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
