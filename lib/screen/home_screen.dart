@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tzdata;
+import 'package:flutter/cupertino.dart';
 
 class Task {
   final String id; // ID để quản lý công việc
@@ -15,8 +16,7 @@ class Task {
   Map<String, dynamic> toMap() {
     return {
       'title': title,
-      'time':
-          '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
+      'time': '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
     };
   }
 
@@ -62,6 +62,8 @@ class NotificationService {
       channelDescription: 'Thông báo nhắc nhở công việc',
       importance: Importance.high,
       priority: Priority.high,
+      sound: RawResourceAndroidNotificationSound('alarm'), // Đảm bảo tên tệp âm thanh là 'alarm'
+      playSound: true, // Bật âm thanh
     );
 
     const NotificationDetails platformChannelSpecifics =
@@ -75,7 +77,7 @@ class NotificationService {
       platformChannelSpecifics,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      androidScheduleMode: AndroidScheduleMode.exact, // Thêm dòng này
+      androidScheduleMode: AndroidScheduleMode.exact,
     );
   }
 }
@@ -122,29 +124,38 @@ class _CalendarScreenState extends State<CalendarScreen> {
   // Thêm công việc
   Future<void> _showAddTaskDialog() async {
     final titleController = TextEditingController();
-    TimeOfDay? selectedTime;
+    Duration selectedDuration = Duration();
 
     await showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Thêm Công Việc'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: Text('Thêm Công Việc', style: TextStyle(color: Colors.teal)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: titleController,
-                decoration: InputDecoration(labelText: 'Tên Công Việc'),
+                decoration: InputDecoration(
+                  labelText: 'Tên Công Việc',
+                  labelStyle: TextStyle(color: Colors.teal),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.teal),
+                  ),
+                ),
               ),
               SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () async {
-                  selectedTime = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.now(),
-                  );
-                },
-                child: Text('Chọn Thời Gian'),
+              SizedBox(
+                height: 150,
+                child: CupertinoTimerPicker(
+                  mode: CupertinoTimerPickerMode.hm,
+                  onTimerDurationChanged: (Duration newDuration) {
+                    selectedDuration = newDuration;
+                  },
+                ),
               ),
             ],
           ),
@@ -153,21 +164,25 @@ class _CalendarScreenState extends State<CalendarScreen> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('Hủy'),
+              child: Text('Hủy', style: TextStyle(color: Colors.teal)),
             ),
             TextButton(
               onPressed: () {
-                if (titleController.text.isNotEmpty && selectedTime != null) {
+                if (titleController.text.isNotEmpty) {
+                  final selectedTime = TimeOfDay(
+                    hour: selectedDuration.inHours,
+                    minute: selectedDuration.inMinutes % 60,
+                  );
                   final task = Task(
                     id: '',
                     title: titleController.text,
-                    time: selectedTime!,
+                    time: selectedTime,
                   );
                   _addTaskToFirebase(_selectedDay ?? _focusedDay, task);
                 }
                 Navigator.pop(context);
               },
-              child: Text('Thêm'),
+              child: Text('Thêm', style: TextStyle(color: Colors.teal)),
             ),
           ],
         );
@@ -218,6 +233,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Lịch Công Việc'),
+        backgroundColor: Colors.teal,
       ),
       body: Column(
         children: [
@@ -237,21 +253,52 @@ class _CalendarScreenState extends State<CalendarScreen> {
             eventLoader: (day) {
               return _tasks[day] ?? [];
             },
+            calendarStyle: CalendarStyle(
+              todayDecoration: BoxDecoration(
+                color: Colors.teal,
+                shape: BoxShape.circle,
+              ),
+              selectedDecoration: BoxDecoration(
+                color: Colors.tealAccent,
+                shape: BoxShape.circle,
+              ),
+              markersMaxCount: 1,
+              markerDecoration: BoxDecoration(
+                color: Colors.teal,
+                shape: BoxShape.circle,
+              ),
+            ),
+            headerStyle: HeaderStyle(
+              formatButtonVisible: false,
+              titleCentered: true,
+              titleTextStyle: TextStyle(
+                color: Colors.teal,
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
           Expanded(
             child: ListView.builder(
               itemCount: _tasks[_selectedDay ?? _focusedDay]?.length ?? 0,
               itemBuilder: (context, index) {
                 final task = _tasks[_selectedDay ?? _focusedDay]![index];
-                return ListTile(
-                  leading: Icon(Icons.work),
-                  title: Text(task.title),
-                  subtitle: Text('Giờ: ${task.time.hour}:${task.time.minute}'),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      _deleteTaskFromFirebase(task);
-                    },
+                return Card(
+                  margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 5,
+                  child: ListTile(
+                    leading: Icon(Icons.work, color: Colors.teal),
+                    title: Text(task.title),
+                    subtitle: Text('Giờ: ${task.time.hour}:${task.time.minute}'),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {
+                        _deleteTaskFromFirebase(task);
+                      },
+                    ),
                   ),
                 );
               },
@@ -262,6 +309,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddTaskDialog,
         child: Icon(Icons.add),
+        backgroundColor: Colors.teal,
       ),
     );
   }
