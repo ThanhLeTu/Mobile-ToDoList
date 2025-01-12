@@ -5,34 +5,22 @@ import '../services/notification_service.dart';
 class TaskController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final NotificationService _notificationService;
-    final String userId;
+  final String userId;
 
-  TaskController(this._notificationService,this.userId);
+  TaskController(this._notificationService, this.userId);
 
-  // Stream<Map<DateTime, List<Task>>> getTasksStream() {
-  //   return _firestore.collection('tasks') .where('userId', isEqualTo: userId).snapshots().map((querySnapshot) {
-  //     Map<DateTime, List<Task>> tasks = {};
-  //     querySnapshot.docs.forEach((doc) {
-  //       final task = Task.fromMap(doc.id, doc.data() as Map<String, dynamic>);
-  //       final date = DateTime.parse(doc['day']);
-  //       if (tasks[date] == null) {
-  //         tasks[date] = [];
-  //       }
-  //       tasks[date]!.add(task);
-  //     });
-  //     return tasks;
-  //   });
-  // }
-Stream<Map<DateTime, List<Task>>> getTasksStream() {
-  return _firestore.collection('tasks')
-    .where('userId', isEqualTo: userId)
-    .snapshots()
-    .map((querySnapshot) {
+  Stream<Map<DateTime, List<Task>>> getTasksStream() {
+    return _firestore
+        .collection('tasks')
+        .where('userId', isEqualTo: userId)
+        .snapshots()
+        .map((querySnapshot) {
       Map<DateTime, List<Task>> tasks = {};
       querySnapshot.docs.forEach((doc) {
         final task = Task.fromMap(doc.id, doc.data() as Map<String, dynamic>);
         final date = DateTime.parse(doc['day']);
-        final dateKey = DateTime(date.year, date.month, date.day); // Ensure date is normalized
+        final dateKey = DateTime(
+            date.year, date.month, date.day); // Ensure date is normalized
         if (tasks[dateKey] == null) {
           tasks[dateKey] = [];
         }
@@ -40,16 +28,20 @@ Stream<Map<DateTime, List<Task>>> getTasksStream() {
       });
       return tasks;
     });
-}
+  }
+
   Future<void> addTask(DateTime day, Task task) async {
     final docRef = _firestore.collection('tasks').doc();
-    
+
     await docRef.set({
-      'id': docRef.id,
+      // 'id': docRef.id,
+      'id': task.id,
       'title': task.title,
-      'time': '${task.time.hour}:${task.time.minute.toString().padLeft(2, '0')}',
+      'time':
+          '${task.time.hour}:${task.time.minute.toString().padLeft(2, '0')}',
       'day': day.toIso8601String(),
-       'userId': userId,
+      // 'userId': userId,
+      'userId': task.userId,
     });
 
     final newTask = Task(
@@ -66,7 +58,7 @@ Stream<Map<DateTime, List<Task>>> getTasksStream() {
       task.time.hour,
       task.time.minute,
     );
-    
+
     await _notificationService.scheduleNotification(newTask, notificationTime);
   }
 
