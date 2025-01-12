@@ -1,3 +1,4 @@
+import 'package:do_an/screen/ForgetPassword_screen.dart';
 import 'package:do_an/screen/home_screen.dart';
 import 'package:do_an/screen/register_screen.dart';
 import 'package:do_an/services/auth_service.dart';
@@ -67,6 +68,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   );
                 },
                 child: Text('Chưa có tài khoản? Đăng ký ngay'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ForgotPasswordScreen()),
+                  );
+                },
+                child: Text('Quên mật khẩu!'),
               ),
             ],
           ),

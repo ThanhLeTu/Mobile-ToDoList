@@ -50,4 +50,28 @@ class NotificationService {
   Future<void> cancelNotification(int id) async {
     await flutterLocalNotificationsPlugin.cancel(id);
   }
+
+
+
+   Future<void> showNotification({required String title, required String body}) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'task_channel', // Channel ID
+      'Task Notifications', // Channel name
+      channelDescription: 'Notifications for tasks and reminders', // Description
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: true,
+    );
+
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0, // Notification ID (unique for each notification)
+      title, // Notification title
+      body, // Notification body
+      platformChannelSpecifics,
+    );
+  }
 }

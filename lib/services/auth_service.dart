@@ -14,6 +14,7 @@ class AuthService {
     required String email,
     required String password,
     required String displayName,
+    required String phoneNumber,
   }) async {
     try {
       final UserCredential result = await _auth.createUserWithEmailAndPassword(
@@ -28,12 +29,14 @@ class AuthService {
           'uid': user.uid,
           'email': email,
           'displayName': displayName,
+          'phoneNumber': phoneNumber
         });
 
         return UserModel(
           uid: user.uid,
           email: email,
           displayName: displayName,
+          phoneNumber: phoneNumber
         );
       }
     } catch (e) {
