@@ -9,21 +9,38 @@ class TaskController {
 
   TaskController(this._notificationService,this.userId);
 
-  Stream<Map<DateTime, List<Task>>> getTasksStream() {
-    return _firestore.collection('tasks') .where('userId', isEqualTo: userId).snapshots().map((querySnapshot) {
+  // Stream<Map<DateTime, List<Task>>> getTasksStream() {
+  //   return _firestore.collection('tasks') .where('userId', isEqualTo: userId).snapshots().map((querySnapshot) {
+  //     Map<DateTime, List<Task>> tasks = {};
+  //     querySnapshot.docs.forEach((doc) {
+  //       final task = Task.fromMap(doc.id, doc.data() as Map<String, dynamic>);
+  //       final date = DateTime.parse(doc['day']);
+  //       if (tasks[date] == null) {
+  //         tasks[date] = [];
+  //       }
+  //       tasks[date]!.add(task);
+  //     });
+  //     return tasks;
+  //   });
+  // }
+Stream<Map<DateTime, List<Task>>> getTasksStream() {
+  return _firestore.collection('tasks')
+    .where('userId', isEqualTo: userId)
+    .snapshots()
+    .map((querySnapshot) {
       Map<DateTime, List<Task>> tasks = {};
       querySnapshot.docs.forEach((doc) {
         final task = Task.fromMap(doc.id, doc.data() as Map<String, dynamic>);
         final date = DateTime.parse(doc['day']);
-        if (tasks[date] == null) {
-          tasks[date] = [];
+        final dateKey = DateTime(date.year, date.month, date.day); // Ensure date is normalized
+        if (tasks[dateKey] == null) {
+          tasks[dateKey] = [];
         }
-        tasks[date]!.add(task);
+        tasks[dateKey]!.add(task);
       });
       return tasks;
     });
-  }
-
+}
   Future<void> addTask(DateTime day, Task task) async {
     final docRef = _firestore.collection('tasks').doc();
     
