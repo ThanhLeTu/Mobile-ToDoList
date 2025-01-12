@@ -43,21 +43,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
     _taskController = TaskController(_notificationService, widget.userId);
     _authService = AuthService();
     _groupController = GroupController(widget.userId);
-    _loadUserInfo();
+   
     _loadTasks();
   }
 
-  void _loadUserInfo() async {
-    // Lấy thông tin người dùng từ Firebase Auth
-    final user = await _authService.getCurrentUser();
-    if (user != null) {
-      setState(() {
-        displayName = user.displayName ?? "Không có tên";
-        email = user.email ?? "Không có email";
-        phoneNumber = user.phoneNumber ?? "Không có số điện thoại";
-      });
-    }
-  }
 
   void _loadTasks() {
     _taskController.getTasksStream().listen((tasks) {

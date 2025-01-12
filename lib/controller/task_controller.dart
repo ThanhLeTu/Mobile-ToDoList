@@ -10,20 +10,6 @@ class TaskController {
 
   TaskController(this._notificationService, this.userId);
 
-  // Stream<Map<DateTime, List<Task>>> getTasksStream() {
-  //   return _firestore.collection('tasks') .where('userId', isEqualTo: userId).snapshots().map((querySnapshot) {
-  //     Map<DateTime, List<Task>> tasks = {};
-  //     querySnapshot.docs.forEach((doc) {
-  //       final task = Task.fromMap(doc.id, doc.data() as Map<String, dynamic>);
-  //       final date = DateTime.parse(doc['day']);
-  //       if (tasks[date] == null) {
-  //         tasks[date] = [];
-  //       }
-  //       tasks[date]!.add(task);
-  //     });
-  //     return tasks;
-  //   });
-  // }
   Stream<Map<DateTime, List<Task>>> getTasksStream() {
     return _firestore
         .collection('tasks')
@@ -45,7 +31,7 @@ class TaskController {
 
   Future<void> addTask(DateTime day, Task task) async {
     final docRef = _firestore.collection('tasks').doc();
-  
+
     await docRef.set({
       // 'id': docRef.id,
       'id': task.id,
@@ -56,7 +42,7 @@ class TaskController {
       // 'userId': userId,
       'userId': task.userId,
     });
-  
+
     final newTask = Task(
       id: docRef.id,
       title: task.title,

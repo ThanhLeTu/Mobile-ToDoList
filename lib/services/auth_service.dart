@@ -14,14 +14,17 @@ class AuthService {
     required String email,
     required String password,
     required String displayName,
-    required String phoneNumber,
+    required String phone,
+    required String address,
+    required DateTime birthDate,
+    required String gender,
   }) async {
     try {
+      // Tạo user authentication
       final UserCredential result = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
-      
       final User? user = result.user;
       if (user != null) {
         // Tạo user profile trong Firestore
@@ -29,21 +32,26 @@ class AuthService {
           'uid': user.uid,
           'email': email,
           'displayName': displayName,
-          'phoneNumber': phoneNumber
+          'address': address,
+          'birthDate': birthDate.toIso8601String(),
+          'gender': gender,
+          'createdAt': DateTime.now().toIso8601String(),
         });
-
+        // Trả về UserModel với đầy đủ thông tin
         return UserModel(
           uid: user.uid,
           email: email,
           displayName: displayName,
-          phoneNumber: phoneNumber
+          phone: phone,
+          address: address,
+          birthDate: birthDate,
+          gender: gender,
         );
       }
     } catch (e) {
-      print(e.toString());
-      return null;
+      print('Lỗi đăng ký: ${e.toString()}');
+      throw e;
     }
-    return null;
   }
 
   // Đăng nhập

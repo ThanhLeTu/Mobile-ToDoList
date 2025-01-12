@@ -1,23 +1,31 @@
-import 'dart:ffi';
-
 class UserModel {
   final String uid;
   final String email;
   final String displayName;
-  final String phoneNumber;
-  // final Array list 
-  UserModel(
-      {required this.uid,
-      required this.email,
-      required this.displayName,
-      required this.phoneNumber});
+  final String phone;
+  final String address;
+  final DateTime birthDate;
+  final String gender;
+
+  UserModel({
+    required this.uid,
+    required this.email,
+    required this.displayName,
+    required this.phone,
+    required this.address,
+    required this.birthDate,
+    required this.gender,
+  });
 
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
       'email': email,
       'displayName': displayName,
-      'phoneNumber': phoneNumber,
+      'phone': phone,
+      'address': address,
+      'birthDate': birthDate.toIso8601String(),
+      'gender': gender,
     };
   }
 
@@ -26,7 +34,10 @@ class UserModel {
       uid: map['uid'] ?? '',
       email: map['email'] ?? '',
       displayName: map['displayName'] ?? '',
-      phoneNumber: map['phoneNumber'] ?? '',
+      phone: map['phone'] ?? '',
+      address: map['address'] ?? '',
+      birthDate: DateTime.parse(map['birthDate'] ?? DateTime.now().toIso8601String()),
+      gender: map['gender'] ?? '',
     );
   }
 }
