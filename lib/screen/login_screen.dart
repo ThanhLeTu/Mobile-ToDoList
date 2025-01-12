@@ -1,3 +1,4 @@
+import 'package:do_an/screen/ForgetPassword_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'home_screen.dart';
@@ -13,12 +14,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
-  bool _obscurePassword = true;  // Ẩn/hiện password
+  bool _obscurePassword = true; // Ẩn/hiện password
 
   // Thêm hàm hiển thị thông báo
   void _showMessage(String message, bool isError) {
     if (!mounted) return;
-    
+
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -38,21 +39,23 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() => _isLoading = true);
       try {
-        final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        final userCredential =
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text,
           password: _passwordController.text,
         );
         if (userCredential.user != null) {
           _showMessage('Đăng nhập thành công!', false);
-          
+
           // Chờ 2 giây để hiển thị thông báo
           await Future.delayed(Duration(seconds: 2));
-          
+
           if (!mounted) return;
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => CalendarScreen(userId: userCredential.user!.uid),
+              builder: (context) =>
+                  CalendarScreen(userId: userCredential.user!.uid),
             ),
           );
         }
@@ -75,9 +78,8 @@ class _LoginScreenState extends State<LoginScreen> {
             default:
               errorMessage = 'Đã có lỗi xảy ra: ${e.message}';
           }
-        }
-        else{
-           errorMessage = 'Lỗi không xác định: $e';
+        } else {
+          errorMessage = 'Lỗi không xác định: $e';
         }
         _showMessage(errorMessage, true);
       } finally {
@@ -127,12 +129,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Color(0xFF7C4DFF), width: 2),
+                      borderSide:
+                          BorderSide(color: Color(0xFF7C4DFF), width: 2),
                     ),
                     labelStyle: TextStyle(color: Color(0xFF7C4DFF)),
                   ),
-                  validator: (value) => 
-                    value?.isEmpty ?? true ? 'Vui lòng nhập email' : null,
+                  validator: (value) =>
+                      value?.isEmpty ?? true ? 'Vui lòng nhập email' : null,
                 ),
                 SizedBox(height: 20),
                 TextFormField(
@@ -143,7 +146,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     prefixIcon: Icon(Icons.lock, color: Color(0xFF7C4DFF)),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                        _obscurePassword
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                         color: Color(0xFF7C4DFF),
                       ),
                       onPressed: () {
@@ -157,12 +162,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Color(0xFF7C4DFF), width: 2),
+                      borderSide:
+                          BorderSide(color: Color(0xFF7C4DFF), width: 2),
                     ),
                     labelStyle: TextStyle(color: Color(0xFF7C4DFF)),
                   ),
                   validator: (value) =>
-                    value?.isEmpty ?? true ? 'Vui lòng nhập mật khẩu' : null,
+                      value?.isEmpty ?? true ? 'Vui lòng nhập mật khẩu' : null,
                 ),
                 SizedBox(height: 30),
                 ElevatedButton(
@@ -176,22 +182,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     elevation: 2,
                   ),
                   child: _isLoading
-                    ? SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
+                      ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          'Đăng Nhập',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
-                      )
-                    : Text(
-                        'Đăng Nhập',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
                 ),
                 SizedBox(height: 20),
                 Row(
@@ -205,7 +211,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => RegisterScreen()),
+                          MaterialPageRoute(
+                              builder: (context) => RegisterScreen()),
                         );
                       },
                       child: Text(
@@ -217,6 +224,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ],
+                ),
+                SizedBox(height: 10),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ForgotPasswordScreen()),
+                    );
+                  },
+                  child: Text(
+                    'Quên mật khẩu!',
+                    style: TextStyle(
+                      color: Color(0xFF7C4DFF),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ],
             ),
